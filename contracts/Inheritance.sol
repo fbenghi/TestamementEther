@@ -30,8 +30,9 @@ contract Inheritance {
 
         // Other variables can be simply overwritten 
         _testament.beneficiary = _beneficiary;        
-        _testament.lastCounterReset = block.timestamp;
         _testament.maxCount    = _maxCount;
+
+        setCounterInitialState(_testament);
         
 
         console.log("Asset Owner: ", msg.sender);
@@ -59,14 +60,19 @@ contract Inheritance {
         );
     }
 
+    function setCounterInitialState(Testament storage _testament) internal
+    {
+        _testament.lastCounterReset = block.timestamp;
+        _testament.beneficiaryCanWithdraw = false;
+    }
+
     function resetCounter() public
     {
         Testament storage _testament = testaments[msg.sender];
         
         if(_testament.lastCounterReset != 0)
         {
-            testaments[msg.sender].lastCounterReset = block.timestamp;
-            _testament.beneficiaryCanWithdraw = false;
+            setCounterInitialState(_testament);
         }
     }
 
