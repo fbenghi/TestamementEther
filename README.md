@@ -1,15 +1,10 @@
-# Basic Sample Hardhat Project
+# Inheritance v1
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+## Description
 
-Try running some of the following tasks:
+If a cryto holder dies, his assets are lost if the heirs don't have access to the private keys. To solve this problem, this contract functions as an watchdog: if the asset holder doesn't reset the watchdog counter, the heirs can withdraw the asset. 
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
-```
+Version 1 is a prove of concept:
+* An address can indicate only one heir and a maximum time for the counter reset. 
+* Only Ethers transactions are accepted (v2 will handle tokens only) 
+* The asset holder may still withdral its own assets  
