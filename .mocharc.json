@@ -1,0 +1,5 @@
+{
+    "require": "hardhat/register",
+    "mochaExplorer.logfile" : "testemoch.txt",
+    "timeout": 20000
+}
