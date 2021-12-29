@@ -36,9 +36,7 @@ describe("SetTestament", function () {
     expect(test[0]).to.equal(beneficiary.address);
     expect(test[1]).to.equal(ethers.utils.parseEther("1.0") );
   });
-});
 
-describe("SetTestament", function () {
   it("Add value to existing entry", async function () {
     // Deploy
     const Inheritance = await ethers.getContractFactory("Inheritance");
@@ -65,5 +63,95 @@ describe("SetTestament", function () {
     // Testing
     expect(test[0]).to.equal(beneficiary2.address);
     expect(test[1]).to.equal(ethers.utils.parseEther("2.0") );
+  });
+});
+
+describe("ResetCounter", function () {
+  it("Check if counter was reset to new timestamp", async function () {
+    // Deploy
+    const Inheritance = await ethers.getContractFactory("Inheritance");
+    const inheritance = await Inheritance.deploy();
+    await inheritance.deployed();
+
+    // Accounts
+    const accounts = await ethers.getSigners();
+    const owner   = accounts[0];
+    const beneficiary = accounts[1];
+
+    // Send transaction
+    let overrides = {
+      // To convert Ether to Wei:
+      value: ethers.utils.parseEther("1.0")     // ether in this case MUST be a string
+    }
+    await inheritance.setTestament(beneficiary.address, 1000, overrides);
+    
+    // Get values from contract
+    var test1 = await inheritance.getTestament(owner.address);
+
+    await inheritance.resetCounter();
+    var test2 = await inheritance.getTestament(owner.address);
+
+    expect(test1.lastCounterReset.toNumber()).to.lessThan(test2.lastCounterReset.toNumber());
+  });
+});
+
+describe("CheckTimeout", function () {
+  it("Enough time to withdraw assets", async function () {
+    // Deploy
+    const Inheritance = await ethers.getContractFactory("Inheritance");
+    const inheritance = await Inheritance.deploy();
+    await inheritance.deployed();
+
+    // Accounts
+    const accounts = await ethers.getSigners();
+    const owner   = accounts[0];
+    const beneficiary = accounts[1];
+
+    // Send transaction
+    let overrides = {
+      // To convert Ether to Wei:
+      value: ethers.utils.parseEther("1.0")     // ether in this case MUST be a string
+    }
+    await inheritance.setTestament(beneficiary.address, 1, overrides);
+
+    // Increase blocks count
+    await network.provider.send("evm_mine")
+    await network.provider.send("evm_mine")
+
+    // Check if enough time has passed
+    await inheritance.checkTimeout(owner.address);
+    var test = await inheritance.getTestament(owner.address);
+
+    // Beneficiary can withdraw assets
+    expect(test.beneficiaryCanWithdraw).to.be.true;
+  });
+
+  it("NOT enough time to withdraw assets", async function () {
+    // Deploy
+    const Inheritance = await ethers.getContractFactory("Inheritance");
+    const inheritance = await Inheritance.deploy();
+    await inheritance.deployed();
+
+    // Accounts
+    const accounts = await ethers.getSigners();
+    const owner   = accounts[0];
+    const beneficiary = accounts[1];
+
+    // Send transaction
+    let overrides = {
+      // To convert Ether to Wei:
+      value: ethers.utils.parseEther("1.0")     // ether in this case MUST be a string
+    }
+    await inheritance.setTestament(beneficiary.address, 10, overrides);
+
+    // Increase blocks count
+    await network.provider.send("evm_mine")
+    
+    // Check if enough time has passed - It hasnt
+    await expect( inheritance.checkTimeout(owner.address) ).to.be.reverted;
+    
+    // Assets no available
+    var test = await inheritance.getTestament(owner.address);
+    expect(test.beneficiaryCanWithdraw).to.be.false;
   });
 });

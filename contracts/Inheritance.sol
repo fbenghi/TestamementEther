@@ -10,6 +10,7 @@ contract Inheritance {
         uint deposit;
         uint lastCounterReset;
         uint maxCount;
+        bool beneficiaryCanWithdraw;
     }
 
     mapping(address => Testament) public testaments;
@@ -32,7 +33,7 @@ contract Inheritance {
         _testament.lastCounterReset = block.timestamp;
         _testament.maxCount    = _maxCount;
         
-        
+
         console.log("Asset Owner: ", msg.sender);
         console.log("Beneficiary: ", testaments[msg.sender].deposit);
         console.log("Last time counter was reset ", testaments[msg.sender].lastCounterReset);
@@ -45,15 +46,39 @@ contract Inheritance {
             address payable beneficiary,
             uint deposit,
             uint lastCounterReset,
-            uint maxCount
+            uint maxCount,
+            bool beneficiaryCanWithdraw
         )
         
     {
         return (testaments[owner].beneficiary,
             testaments[owner].deposit,
             testaments[owner].lastCounterReset,
-            testaments[owner].maxCount
+            testaments[owner].maxCount,
+            testaments[owner].beneficiaryCanWithdraw
         );
+    }
+
+    function resetCounter() public
+    {
+        Testament storage _testament = testaments[msg.sender];
+        
+        if(_testament.lastCounterReset != 0)
+        {
+            testaments[msg.sender].lastCounterReset = block.timestamp;
+            _testament.beneficiaryCanWithdraw = false;
+        }
+    }
+
+    function checkTimeout(address payable owner)  public
+    {
+        Testament storage _testament = testaments[owner];
+
+        require(_testament.lastCounterReset != 0, "No testament available");
+        require((testaments[owner].lastCounterReset+testaments[owner].maxCount) < block.timestamp, 
+                 "Not enough time passed by");
+        
+        _testament.beneficiaryCanWithdraw = true;
     }
 
 }
