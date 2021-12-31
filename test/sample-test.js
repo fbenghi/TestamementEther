@@ -11,11 +11,17 @@ describe("Deploy", function () {
 
 
 describe("SetTestament", function () {
-  it("Add new entry", async function () {
-    // Deploy
-    const Inheritance = await ethers.getContractFactory("Inheritance");
-    const inheritance = await Inheritance.deploy();
+  let Inheritance;
+  let inheritance;
+
+  beforeEach(async function() {
+    Inheritance = await ethers.getContractFactory("Inheritance");
+    inheritance = await Inheritance.deploy();
     await inheritance.deployed();
+  });
+
+
+  it("Add new entry", async function () {
 
     // Accounts
     const accounts = await ethers.getSigners();
@@ -38,11 +44,6 @@ describe("SetTestament", function () {
   });
 
   it("Add value to existing entry", async function () {
-    // Deploy
-    const Inheritance = await ethers.getContractFactory("Inheritance");
-    const inheritance = await Inheritance.deploy();
-    await inheritance.deployed();
-
     // Accounts
     const accounts = await ethers.getSigners();
     const owner   = accounts[0];
@@ -67,12 +68,18 @@ describe("SetTestament", function () {
 });
 
 describe("ResetCounter", function () {
-  it("Check if counter was reset to new timestamp", async function () {
-    // Deploy
-    const Inheritance = await ethers.getContractFactory("Inheritance");
-    const inheritance = await Inheritance.deploy();
-    await inheritance.deployed();
 
+  let Inheritance;
+  let inheritance;
+
+  beforeEach(async function() {
+    Inheritance = await ethers.getContractFactory("Inheritance");
+    inheritance = await Inheritance.deploy();
+    await inheritance.deployed();
+  });
+
+
+  it("Check if counter was reset to new timestamp", async function () {
     // Accounts
     const accounts = await ethers.getSigners();
     const owner   = accounts[0];
@@ -96,11 +103,16 @@ describe("ResetCounter", function () {
 });
 
 describe("CheckTimeout", function () {
-  it("Enough time to withdraw assets", async function () {
-    // Deploy
-    const Inheritance = await ethers.getContractFactory("Inheritance");
-    const inheritance = await Inheritance.deploy();
+  let Inheritance;
+  let inheritance;
+
+  beforeEach(async function() {
+    Inheritance = await ethers.getContractFactory("Inheritance");
+    inheritance = await Inheritance.deploy();
     await inheritance.deployed();
+  });
+
+  it("Enough time to withdraw assets", async function () {
 
     // Accounts
     const accounts = await ethers.getSigners();
@@ -127,10 +139,6 @@ describe("CheckTimeout", function () {
   });
 
   it("NOT enough time to withdraw assets", async function () {
-    // Deploy
-    const Inheritance = await ethers.getContractFactory("Inheritance");
-    const inheritance = await Inheritance.deploy();
-    await inheritance.deployed();
 
     // Accounts
     const accounts = await ethers.getSigners();
