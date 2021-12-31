@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 
-contract Inheritance {
+contract TestamentContract {
 
     struct Testament {
         address payable beneficiary;

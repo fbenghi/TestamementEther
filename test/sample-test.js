@@ -4,21 +4,21 @@ const { ethers } = require("hardhat");
 
 describe("Deploy", function () {
   it("Should deploy the contract", async function () {
-    const Inheritance = await ethers.getContractFactory("Inheritance");
-    const inheritance = await Inheritance.deploy();
-    await inheritance.deployed();
+    const TestamentContract = await ethers.getContractFactory("TestamentContract");
+    const testamentcontract = await TestamentContract.deploy();
+    await testamentcontract.deployed();
   });
 });
 
 
 describe("SetTestament", function () {
-  let Inheritance;
-  let inheritance;
+  let TestamentContract;
+  let testamentcontract;
 
   beforeEach(async function() {
-    Inheritance = await ethers.getContractFactory("Inheritance");
-    inheritance = await Inheritance.deploy();
-    await inheritance.deployed();
+    TestamentContract = await ethers.getContractFactory("TestamentContract");
+    testamentcontract = await TestamentContract.deploy();
+    await testamentcontract.deployed();
   });
 
 
@@ -34,10 +34,10 @@ describe("SetTestament", function () {
       // To convert Ether to Wei:
       value: ethers.utils.parseEther("1.0")     // ether in this case MUST be a string
     }
-    await inheritance.setTestament(beneficiary.address, 1000, overrides);
+    await testamentcontract.setTestament(beneficiary.address, 1000, overrides);
 
     // Get values from contract
-    var test = await inheritance.getTestament(owner.address);
+    var test = await testamentcontract.getTestament(owner.address);
 
     // Testing
     expect(test[0]).to.equal(beneficiary.address);
@@ -56,11 +56,11 @@ describe("SetTestament", function () {
       // To convert Ether to Wei:
       value: ethers.utils.parseEther("1.0")     // ether in this case MUST be a string
     }
-    await inheritance.setTestament(beneficiary1.address, 1000, overrides);
-    await inheritance.setTestament(beneficiary2.address, 1000, overrides);
+    await testamentcontract.setTestament(beneficiary1.address, 1000, overrides);
+    await testamentcontract.setTestament(beneficiary2.address, 1000, overrides);
 
     // Get values from contract
-    var test = await inheritance.getTestament(owner.address);
+    var test = await testamentcontract.getTestament(owner.address);
 
     // Testing
     expect(test[0]).to.equal(beneficiary2.address);
@@ -70,13 +70,13 @@ describe("SetTestament", function () {
 
 describe("ResetCounter", function () {
 
-  let Inheritance;
-  let inheritance;
+  let TestamentContract;
+  let testamentcontract;
 
   beforeEach(async function() {
-    Inheritance = await ethers.getContractFactory("Inheritance");
-    inheritance = await Inheritance.deploy();
-    await inheritance.deployed();
+    TestamentContract = await ethers.getContractFactory("TestamentContract");
+    testamentcontract = await TestamentContract.deploy();
+    await testamentcontract.deployed();
   });
 
 
@@ -91,26 +91,26 @@ describe("ResetCounter", function () {
       // To convert Ether to Wei:
       value: ethers.utils.parseEther("1.0")     // ether in this case MUST be a string
     }
-    await inheritance.setTestament(beneficiary.address, 1000, overrides);
+    await testamentcontract.setTestament(beneficiary.address, 1000, overrides);
     
     // Get values from contract
-    var test1 = await inheritance.getTestament(owner.address);
+    var test1 = await testamentcontract.getTestament(owner.address);
 
-    await inheritance.resetCounter();
-    var test2 = await inheritance.getTestament(owner.address);
+    await testamentcontract.resetCounter();
+    var test2 = await testamentcontract.getTestament(owner.address);
 
     expect(test1.lastCounterReset.toNumber()).to.lessThan(test2.lastCounterReset.toNumber());
   });
 });
 
 describe("CheckTimeout", function () {
-  let Inheritance;
-  let inheritance;
+  let TestamentContract;
+  let testamentcontract;
 
   beforeEach(async function() {
-    Inheritance = await ethers.getContractFactory("Inheritance");
-    inheritance = await Inheritance.deploy();
-    await inheritance.deployed();
+    TestamentContract = await ethers.getContractFactory("TestamentContract");
+    testamentcontract = await TestamentContract.deploy();
+    await testamentcontract.deployed();
   });
 
   it("Enough time to withdraw assets", async function () {
@@ -125,15 +125,15 @@ describe("CheckTimeout", function () {
       // To convert Ether to Wei:
       value: ethers.utils.parseEther("1.0")     // ether in this case MUST be a string
     }
-    await inheritance.setTestament(beneficiary.address, 1, overrides);
+    await testamentcontract.setTestament(beneficiary.address, 1, overrides);
 
     // Increase blocks count
     await network.provider.send("evm_mine")
     await network.provider.send("evm_mine")
 
     // Check if enough time has passed
-    await inheritance.checkTimeout(owner.address);
-    var test = await inheritance.getTestament(owner.address);
+    await testamentcontract.checkTimeout(owner.address);
+    var test = await testamentcontract.getTestament(owner.address);
 
     // Beneficiary can withdraw assets
     expect(test.beneficiaryCanWithdraw).to.be.true;
@@ -151,16 +151,16 @@ describe("CheckTimeout", function () {
       // To convert Ether to Wei:
       value: ethers.utils.parseEther("1.0")     // ether in this case MUST be a string
     }
-    await inheritance.setTestament(beneficiary.address, 10, overrides);
+    await testamentcontract.setTestament(beneficiary.address, 10, overrides);
 
     // Increase blocks count
     await network.provider.send("evm_mine")
     
     // Check if enough time has passed - It hasnt
-    await expect( inheritance.checkTimeout(owner.address) ).to.be.reverted;
+    await expect( testamentcontract.checkTimeout(owner.address) ).to.be.reverted;
     
     // Assets no available
-    var test = await inheritance.getTestament(owner.address);
+    var test = await testamentcontract.getTestament(owner.address);
     expect(test.beneficiaryCanWithdraw).to.be.false;
   });
 });
@@ -168,8 +168,8 @@ describe("CheckTimeout", function () {
 
 describe("BeneficiaryWithdraw", function () {
   // Contract instances
-  let Inheritance;
-  let inheritance;
+  let TestamentContract;
+  let testamentcontract;
 
   // Acounts
   let accounts;
@@ -183,9 +183,9 @@ describe("BeneficiaryWithdraw", function () {
 
 
   beforeEach(async function() {
-    Inheritance = await ethers.getContractFactory("Inheritance");
-    inheritance = await Inheritance.deploy();
-    await inheritance.deployed();
+    TestamentContract = await ethers.getContractFactory("TestamentContract");
+    testamentcontract = await TestamentContract.deploy();
+    await testamentcontract.deployed();
 
     accounts     = await ethers.getSigners();
     owner        = accounts[0];
@@ -199,14 +199,14 @@ describe("BeneficiaryWithdraw", function () {
       // To convert Ether to Wei:
       value: ethers.utils.parseEther("1.0")     // ether in this case MUST be a string
     }
-    await inheritance.setTestament(beneficiary.address, 1, overrides);
+    await testamentcontract.setTestament(beneficiary.address, 1, overrides);
 
     // Increase blocks count
     await network.provider.send("evm_mine")
     await network.provider.send("evm_mine")
 
     // Check if enough time has passed
-    await inheritance.checkTimeout(owner.address);
+    await testamentcontract.checkTimeout(owner.address);
 
 
   });
@@ -215,7 +215,7 @@ describe("BeneficiaryWithdraw", function () {
   it("Beneficiary can withdraw", async function () {
     
     // Beneficiary withdraw
-    await inheritance.connect(beneficiary).beneficiaryWithdraw(owner.address);
+    await testamentcontract.connect(beneficiary).beneficiaryWithdraw(owner.address);
 
     let beneficiaryFinalAmount = await ethers.provider.getBalance(beneficiary.address);
     console.log(ethers.utils.formatEther(beneficiaryInitialAmount));
@@ -227,11 +227,11 @@ describe("BeneficiaryWithdraw", function () {
   it("Beneficiary CANNOT withdraw twice", async function () {
     
     // Beneficiary withdraw
-    await inheritance.connect(beneficiary).beneficiaryWithdraw(owner.address);
-    await expect( inheritance.connect(beneficiary).beneficiaryWithdraw(owner.address) ).to.be.reverted;
+    await testamentcontract.connect(beneficiary).beneficiaryWithdraw(owner.address);
+    await expect( testamentcontract.connect(beneficiary).beneficiaryWithdraw(owner.address) ).to.be.reverted;
   });
 
   it("Thiefs CANNOT withdraw", async function () {
-    await expect( inheritance.connect(thief).beneficiaryWithdraw(owner.address) ).to.be.reverted;
+    await expect( testamentcontract.connect(thief).beneficiaryWithdraw(owner.address) ).to.be.reverted;
   });
 });
