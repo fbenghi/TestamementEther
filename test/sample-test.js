@@ -163,6 +163,35 @@ describe("CheckTimeout", function () {
     var test = await testamentContract.getTestament(owner.address);
     expect(test.beneficiaryCanWithdraw).to.be.false;
   });
+
+  it("Event created", async function () {
+
+    // Accounts
+    const accounts = await ethers.getSigners();
+    const owner   = accounts[0];
+    const beneficiary = accounts[1];
+
+    // Send transaction
+    let overrides = {
+      // To convert Ether to Wei:
+      value: ethers.utils.parseEther("1.0")     // ether in this case MUST be a string
+    }
+    await testamentContract.setTestament(beneficiary.address, 1, overrides);
+
+    // Increase blocks count
+    await network.provider.send("evm_mine")
+    await network.provider.send("evm_mine")
+
+    // Check if enough time has passed
+    await expect(testamentContract.checkTimeout(owner.address))
+    .to.emit(testamentContract, 'EthersAvailable')
+    .withArgs(beneficiary.address, ethers.utils.parseEther("1.0"), owner.address);
+
+    // If I had to query the events...
+    // test = await testamentContract.queryFilter('EthersAvailable');
+
+
+  });
 });
 
 

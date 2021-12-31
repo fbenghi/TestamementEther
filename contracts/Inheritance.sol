@@ -15,6 +15,8 @@ contract TestamentContract {
 
     mapping(address => Testament) public testaments;
 
+    event EthersAvailable(address _beneficiaty, uint _amount, address _donor);
+
     constructor() {
         console.log("Contract deployed");
     }
@@ -85,6 +87,8 @@ contract TestamentContract {
                  "Not enough time passed by");
         
         _testament.beneficiaryCanWithdraw = true;
+
+        emit EthersAvailable(_testament.beneficiary, _testament.deposit, owner);
     }
 
     function beneficiaryWithdraw(address payable owner) public 
