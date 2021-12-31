@@ -87,5 +87,19 @@ contract Inheritance {
         _testament.beneficiaryCanWithdraw = true;
     }
 
+    function beneficiaryWithdraw(address payable owner) public 
+    {
+        Testament storage _testament = testaments[owner];
+        uint deposit = _testament.deposit;
+
+        require(_testament.lastCounterReset > 0, "No testament available");
+        require(_testament.beneficiaryCanWithdraw, "Not enough time to withdraw");
+        require(_testament.deposit > 0, "Not enough assets left");
+        require(_testament.beneficiary == msg.sender, "Not beneficiary");
+
+        _testament.deposit = 0;
+        payable(msg.sender).transfer(deposit);
+    }
+
 }
 
